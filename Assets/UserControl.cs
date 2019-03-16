@@ -44,7 +44,8 @@ public class UserControl : MonoBehaviour {
 		//
 		//int num = (int)(this.currentAngle / 10f);
 		//this.currentAngleRotLocal = Mathf.Lerp(this.currentAngleRotLocal, (float)(num * 10), 20f * Time.deltaTime);
-		this.transform.localRotation = Quaternion.Euler(new Vector3(0f, this.currentAngle, 0f));
+		//if(this.currentAngle % 60 < 10)
+		this.transform.rotation = Quaternion.Euler(new Vector3(0f, this.currentAngle, 0f));
 	}
 
 	private void UpdateInput()
@@ -58,7 +59,8 @@ public class UserControl : MonoBehaviour {
 
 
 		float moveXPercent = moveX / screenWidth;
-
+		//print ("Screen Width : " + screenWidth);
+		//print ("MoveX Percent : " + moveXPercent);
 		float speed = (-Mathf.Sign(Input.mousePosition.x - this.startPosition.x) * moveXPercent) * this.rotateSpeed;
 
 			if (Input.GetMouseButtonDown(0))
@@ -70,7 +72,8 @@ public class UserControl : MonoBehaviour {
 			}
 			else if (Input.GetMouseButton(0))
 			{
-
+				if(moveXPercent > 0 )
+				print ("Precent : " + moveXPercent);
 				this.currentAngleSpeed = 0f;
 				if (moveXPercent > this.minSwipeDistX)
 				{
