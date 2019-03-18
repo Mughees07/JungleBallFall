@@ -21,6 +21,7 @@ public class BallFall : MonoBehaviour {
 		
 			GameObject g = Instantiate (ball);
 			g.GetComponent<Renderer>().material = mats [Random.Range (0, mats.Length)];
+			Destroy (g, 10f);
 			yield return new WaitForSeconds(2f);
 		
 		}

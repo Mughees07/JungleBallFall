@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 //using UnityEditor;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public enum Swipe {
 	None,
@@ -29,7 +32,7 @@ public class SwipeController : MonoBehaviour
 
 	public static Swipe SwipeDirection;
 	public float ReturnForce = 10f;
-
+	public Text cameraView;
 
 	//Player and aniamtor here
 	private Animator anim;
@@ -37,6 +40,7 @@ public class SwipeController : MonoBehaviour
 
     public bool isTouchActive;
 
+	public bool swipeControl;
 
 	public float smooth = 1f;
 	private Quaternion targetRotation;
@@ -49,28 +53,60 @@ public class SwipeController : MonoBehaviour
 		targetRotation = transform.rotation;
 	}
 
+	public void switchControls()
+	{
+		swipeControl = !swipeControl;
+	}
+
+	public void Zoom(bool val)
+	{
+		Camera.main.fieldOfView += (val ? 1 : -1);
+		cameraView.text = "" + Camera.main.fieldOfView;
+	}
+
+
+
+
 	private void Update() 
     {
         if(isTouchActive == true)
         {
             DetectSwipe();
-			if (Input.GetKeyDown (KeyCode.Space)) { 
-				targetRotation *=  Quaternion.AngleAxis(60, Vector3.up);
+			if (rotateRight || rotateLeft) { 
+				float val = rotateRight ? 60f : -60f;
+				targetRotation *=  Quaternion.AngleAxis(val, Vector3.up);
+				rotateRight = false;
+				rotateLeft = false;
 			}
-			transform.rotation= Quaternion.Lerp (transform.rotation, targetRotation , 10 * smooth * Time.deltaTime); 
+			transform.rotation= Quaternion.Slerp (transform.rotation, targetRotation , 10 * smooth * Time.deltaTime); 
         }
 	}
 
 	public void DetectSwipe()
 	{
-		#if UNITY_EDITOR
-		MouseSwipeControl();
-		#else
-		TouchSwipeControl();
-		#endif
+		//#if UNITY_EDITOR
+		if (IsPointerOverUIObject ())
+			return;
+		if (swipeControl)
+			MouseSwipeControl ();
+		else
+			MouseTouchControl ();
+		//#else
+		//TouchSwipeControl();
+		//#endif
 	}
-
-
+	public void MouseTouchControl()
+	{
+		if (Input.GetMouseButtonDown (0)) {
+			if (Input.mousePosition.x < Screen.width / 2) {
+				LeftEvent ();
+				Debug.Log ("Left click");
+			} else if (Input.mousePosition.x > Screen.width / 2) {
+				RightEvent ();
+				Debug.Log ("Right click");
+			}
+		}
+	}
 	#region TouchSwipeControl
 	void TouchSwipeControl()
 	{
@@ -211,13 +247,18 @@ public class SwipeController : MonoBehaviour
 
 
 	public bool firstClick=false;
+	public bool rotateRight=false;
+	public bool rotateLeft=false;
 	#region MouseSwipeControl
 	void MouseSwipeControl()
 	{
 		if ( Input.GetMouseButtonDown( 0 ) ) {
 			_firstClickPos = new Vector2( Input.mousePosition.x, Input.mousePosition.y );
 			firstClick = true;
-		} else {
+		}else if( Input.GetMouseButtonUp( 0 ))	{
+			firstClick = false;
+		}
+		else {
 			SwipeDirection = Swipe.None;
 			//Debug.Log ("None");
 		}
@@ -231,7 +272,7 @@ public class SwipeController : MonoBehaviour
 				SwipeDirection = Swipe.None;
 				return;
 			}
-			firstClick = false;
+			//firstClick = false;
 			_currentSwipe.Normalize();
 
 			//Swipe directional check
@@ -360,12 +401,15 @@ public class SwipeController : MonoBehaviour
 
 	public void LeftEvent()
 	{
-		 
+		_firstClickPos = new Vector2( Input.mousePosition.x, Input.mousePosition.y );
+		rotateLeft = true;
+
 		//swipeValue = 1f;
 	}
 	public void RightEvent()
 	{
-		
+		_firstClickPos = new Vector2( Input.mousePosition.x, Input.mousePosition.y );
+		rotateRight = true;
 		//swipeValue = 2f;
 	}
 	public void DownEvent()
@@ -374,6 +418,16 @@ public class SwipeController : MonoBehaviour
 		//swipeValue = 3f;
 	}
 
+	private bool IsPointerOverUIObject()
+	{
+		var eventDataCurrentPosition = new PointerEventData(EventSystem.current)
+		{
+			position = new Vector2(Input.mousePosition.x, Input.mousePosition.y)
+		};
+		var results = new List<RaycastResult>();
+		EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+		return results.Count > 0;
+	}
 
 	Vector2 insidePoints;
 	bool ExclusionOfUIButtons(Touch t)
