@@ -100,10 +100,10 @@ public class SwipeController : MonoBehaviour
 		if (Input.GetMouseButtonDown (0)) {
 			if (Input.mousePosition.x < Screen.width / 2) {
 				LeftEvent ();
-				Debug.Log ("Left click");
+				//Debug.Log ("Left click");
 			} else if (Input.mousePosition.x > Screen.width / 2) {
 				RightEvent ();
-				Debug.Log ("Right click");
+				//Debug.Log ("Right click");
 			}
 		}
 	}
