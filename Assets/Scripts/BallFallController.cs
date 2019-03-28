@@ -7,12 +7,16 @@ using UnityEngine.UI;
 public class BallFallController : MonoBehaviour {
 
 	// Use this for initialization
+	public GameObject MainMenu;
+	public GameObject CameraController;
+
 	public Text scroe;
 
 	public Transform scorePopupParent;
 	public Text scorePopup;
 	public Material [] mats;
 	public GameObject ball;
+
 	void Start () {
 
 		StartCoroutine (CreateBalls ());
@@ -25,15 +29,18 @@ public class BallFallController : MonoBehaviour {
 	{
 		while (true) {
 		
-			GameObject g = Instantiate (ball , slide );
-			g.transform.localScale = new Vector3 (0.6f, 0.6f, 0.6f);
-			int i = Random.Range (0, mats.Length);
-			g.GetComponent<Renderer>().material = mats [i];
-			g.name = mats [i].name;
-			Destroy (g, 10f);
+			if (Variables.isPlay) 
+			{
+				GameObject g = Instantiate (ball, slide);
+				g.transform.localScale = new Vector3 (0.6f, 0.6f, 0.6f);
+				int i = Random.Range (0, mats.Length);
+				g.GetComponent<Renderer> ().material = mats [i];
+				g.name = mats [i].name;
+				Destroy (g, 10f);
 
-			yield return new WaitForSeconds(2f);
-		
+				yield return new WaitForSeconds (2f);
+			}
+			yield return new WaitForSeconds (0f);
 		}
 
 	}
@@ -62,15 +69,16 @@ public class BallFallController : MonoBehaviour {
 		if (int.Parse (this.scroe.text.ToString ()) <= -10) 
 		{
 			Time.timeScale = 0;
-			this.scroe.text = "GameOver";
+			this.scroe.text = "Game  Over";
 		}
 	}
 
-
-	public void tim()
+	public void Play()
 	{
-		Time.timeScale = 1f;
-	}
+		Variables.isPlay = true;
+		MainMenu.GetComponent<ITweenMagic> ().PlayForwardUIMovement ();
+		CameraController.GetComponent<CPC_CameraPath> ().enabled = true;
 
+	}
 
 }

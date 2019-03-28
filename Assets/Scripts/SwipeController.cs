@@ -69,7 +69,7 @@ public class SwipeController : MonoBehaviour
 
 	private void Update() 
     {
-        if(isTouchActive == true)
+		if(Variables.isPlay == true)
         {
             DetectSwipe();
 			if (rotateRight || rotateLeft) { 
