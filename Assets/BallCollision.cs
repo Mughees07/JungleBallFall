@@ -24,10 +24,18 @@ public class BallCollision : MonoBehaviour {
 			GetComponent<Rigidbody> ().drag = 0.01f;
 			gameObject.layer = LayerMask.NameToLayer("Default");
 
-			if (collision.name == gameObject.name) {
-				//print ("Matched");
-				FindObjectOfType<BallFallController> ().IncreaseScroe (1);
-			} else {
+			if (collision.name == gameObject.name) 
+			{
+				
+				if (Variables.gameMode != Constants.levelBase)
+				{
+					FindObjectOfType<BallFallController> ().IncreaseScroe (1);
+				}
+
+			}
+
+			else 
+			{
 				if (Variables.gameMode == Constants.levelBase)
 				{
 					Variables.isPlay = false;

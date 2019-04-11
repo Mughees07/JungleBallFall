@@ -41,6 +41,7 @@ public class BallFallController : MonoBehaviour {
 		} else {
 			MainMenuPanle.SetActive (true);
 		}
+		Advertisements.Instance.Initialize ();
 	}
 
 	public Transform slide;
@@ -160,7 +161,7 @@ public class BallFallController : MonoBehaviour {
 		CameraController.GetComponent<CPC_CameraPath> ().enabled = true;
 
 		StartCoroutine (CreateBalls ());
-
+		Advertisements.Instance.ShowBanner (BannerPosition.BOTTOM, BannerType.Banner);
 	}
 
 	public void levelScreen()
@@ -195,6 +196,8 @@ public class BallFallController : MonoBehaviour {
 			gameOverPanel.SetActive (true);
 		}
 		Variables.isPlay = false;
+
+		Advertisements.Instance.ShowInterstitial ();
 	}
 		
 	public void Restart()
