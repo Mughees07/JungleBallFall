@@ -28,6 +28,8 @@ public class BallFallController : MonoBehaviour {
 	public Material [] mats;
 	public GameObject ball;
 
+
+	public ParticleSystem flare;
 	void Awake()
 	{
 		MainMenuPanle.SetActive (false);
@@ -100,9 +102,12 @@ public class BallFallController : MonoBehaviour {
 			if (Variables.isPlay) {
 				yield return new WaitForSeconds (4f);
 				print ("Level Passed");
+				flare.Play ();
 				levelPassed.SetActive (true);
+				PlayerPrefs.SetInt ("level", Variables.levelNumber);
+				PlayerPrefs.Save ();
+				print (Variables.levelNumber + "LLLLLLLLLLLL");
 				yield return new WaitForSeconds (2f);
-
 				Variables.levelNumber++;
 				Variables.ballColorCount = FindObjectOfType<LevelEditor> ().level [Variables.levelNumber].numberOfColor;
 				Application.LoadLevel (0);
@@ -190,13 +195,10 @@ public class BallFallController : MonoBehaviour {
 			}
 			else
 				highScoreGameOver.text = Variables.highScore.ToString();
-
-				
-
 			gameOverPanel.SetActive (true);
 		}
 		Variables.isPlay = false;
-
+		//vibrate phone;
 		Advertisements.Instance.ShowInterstitial ();
 	}
 		
@@ -231,5 +233,9 @@ public class BallFallController : MonoBehaviour {
 //		print ("return " + i);
 		return i;
 	}
+
+
+
+
 
 }

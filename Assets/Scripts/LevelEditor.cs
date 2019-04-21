@@ -15,20 +15,27 @@ public class LevelEditor : MonoBehaviour {
 	public GameObject levelScreen;
 
 	// Use this for initialization
-
+	int levelIndex = 0;
 
 	void Awake ()
 	{
 //		Variables.ballColorCount = level [Variables.levelNumber].numberOfColor;
+		//PlayerPrefs.DeleteAll();
+		levelIndex = PlayerPrefs.GetInt("level");
+		print ("Leevbel" + levelIndex.ToString ());
 	}
 	void Start () 
 	{
 		print ("COlor " + Variables.ballColorCount);
-		for (int i = 0; i < level.Count; i++) 
+		for (int i = 0; i < level.Count-1; i++) 
 		{
 			GameObject g = Instantiate (levelButton, levelGrid);
-			g.transform.GetChild (0).GetComponent<Text> ().text = (i+1).ToString();
-			g.GetComponent<Button> ().onClick.AddListener (Level);
+			g.transform.GetChild (0).GetChild (0).GetComponent<Text> ().text = (i+1).ToString();
+
+			if (levelIndex >= i)
+				g.transform.GetChild (1).gameObject.SetActive (false);
+
+			g.transform.GetChild (0).GetComponent<Button> ().onClick.AddListener (Level);
 
 		}
 
@@ -49,5 +56,16 @@ public class LevelEditor : MonoBehaviour {
 
 		levelScreen.SetActive (false);
 	}
-	
+
+
+
+	public void debug()
+	{
+		GameObject[] g = GameObject.FindGameObjectsWithTag ("lock");
+		foreach (GameObject gO in g) 
+		{
+			gO.SetActive (false);
+		}
+	}
+
 }

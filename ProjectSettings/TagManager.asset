@@ -8,6 +8,7 @@ TagManager:
   - Ball
   - Passed
   - door
+  - lock
   layers:
   - Default
   - TransparentFX
