@@ -223,19 +223,32 @@ public class BallFallController : MonoBehaviour {
 	{
 		int j = Variables.ballColorCount - 1;
 		int	i = Random.Range (0,j);
-//		print ("J " + j);
 		while (last == i)
 		{		
 			i = Random.Range (0,j);
 		}
 
 		last = i;
-//		print ("return " + i);
 		return i;
 	}
 
+	public void rewardedVideo()
+	{
+		Advertisements.Instance.ShowRewardedVideo (completedMethod);
+	}
 
+	public void completedMethod(bool isCompleted)
+	{
+		if (isCompleted)
+		{
+			gameOverPanel.SetActive (false);
+			Variables.isPlay = true;
+		}
+		else 
+		{
+			
+		}
 
-
+	}
 
 }
