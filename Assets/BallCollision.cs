@@ -26,28 +26,38 @@ public class BallCollision : MonoBehaviour {
 
 			if (collision.name == gameObject.name) 
 			{
-				
 				if (Variables.gameMode != Constants.levelBase)
 				{
-					FindObjectOfType<BallFallController> ().IncreaseScroe (1);
+					FindObjectOfType<BallFallController> ().IncreaseScroe (1,false);
 				}
-
+				else if (Variables.gameMode == Constants.levelBase)
+				{
+					FindObjectOfType<LevelEditor> ().LevelProgress ();
+					FindObjectOfType<BallFallController> ().IncreaseScroe (Variables.levelNumber,true);
+				}
 			}
 
 			else 
 			{
-				if (Variables.gameMode == Constants.levelBase)
-				{
-					Variables.isPlay = false;
-					FindObjectOfType<BallFallController> ().GameOver ();
-				}
-				else
-					FindObjectOfType<BallFallController> ().DecreaseScroe (1);
+
+				StartCoroutine (delayGameOver());
 			}
-
 		}
+	}
 
+	IEnumerator delayGameOver()
+	{
+		yield return new WaitForSeconds (0.25f);
+		GetComponent<Renderer> ().enabled = false;
+		Renderer rend =	transform.GetChild (0).gameObject.GetComponent<Renderer> ();
+		rend.material = GetComponent<Renderer> ().material;
+		rend.gameObject.SetActive (true);
+		GetComponent<TrailRenderer> ().enabled = false;
+		yield return new WaitForSeconds(0.5f);
+		FindObjectOfType<BallFallController> ().GameOver ();
 
 	}
+
+
 
 }

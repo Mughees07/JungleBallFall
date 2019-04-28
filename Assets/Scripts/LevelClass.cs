@@ -8,5 +8,5 @@ public class LevelClass
 {
 	public int numberOfColor;
 	public int numberOfBalls;
-	public float speed;
+	public float ballAfter;
 }

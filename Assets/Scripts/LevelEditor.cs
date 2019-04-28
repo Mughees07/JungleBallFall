@@ -13,16 +13,28 @@ public class LevelEditor : MonoBehaviour {
 	public Transform levelGrid;
 	public GameObject levelButton;
 	public GameObject levelScreen;
+	public GameObject levelIndicator;
+
+	public  Text start;
+	public  Text end;
+	public  Image fill;
+
 
 	// Use this for initialization
 	int levelIndex = 0;
 
 	void Awake ()
 	{
-//		Variables.ballColorCount = level [Variables.levelNumber].numberOfColor;
-		//PlayerPrefs.DeleteAll();
-		levelIndex = PlayerPrefs.GetInt("level");
-		print ("Leevbel" + levelIndex.ToString ());
+//		PlayerPrefs.DeleteAll ();
+
+		if (!PlayerPrefs.HasKey ("lvl")) 
+		{
+			PlayerPrefs.SetInt ("lvl", 1);
+		}
+		levelIndex = PlayerPrefs.GetInt("lvl");
+		SetLevelValues ();
+
+
 	}
 	void Start () 
 	{
@@ -42,21 +54,36 @@ public class LevelEditor : MonoBehaviour {
 	}
 
 
-	void Level()
+	public void Level()
 	{
-		Variables.levelNumber = int.Parse (EventSystem.current.currentSelectedGameObject.transform.GetChild (0).GetComponent<Text> ().text);
-
-		Variables.numberOfBalls = level [Variables.levelNumber].numberOfBalls;
-		Variables.speed = level [Variables.levelNumber].speed;
-		Variables.ballColorCount =  level [Variables.levelNumber].numberOfColor;
 		print (Variables.levelNumber);
 
 		Variables.gameMode = Constants.levelBase;
 		FindObjectOfType<BallFallController> ().Play ();
-
+		levelIndicator.SetActive (true);
 		levelScreen.SetActive (false);
 	}
 
+
+	void SetLevelValues()
+	{
+		
+
+
+		Variables.levelNumber  = PlayerPrefs.GetInt("lvl");
+		if (Variables.levelNumber == level.Count) 
+		{
+			Variables.levelNumber = 1;
+			PlayerPrefs.SetInt ("lvl" , Variables.levelNumber);
+		}
+		Variables.numberOfBalls = level [Variables.levelNumber].numberOfBalls;
+		Variables.ballAfter = level [Variables.levelNumber].ballAfter;
+		Variables.ballColorCount =  level [Variables.levelNumber].numberOfColor;
+		print (Variables.levelNumber+"__*__");
+		start.text = Variables.levelNumber.ToString();
+		end.text = (Variables.levelNumber + 1).ToString ();
+		Variables.ballCountNow = 0;
+	}
 
 
 	public void debug()
@@ -66,6 +93,15 @@ public class LevelEditor : MonoBehaviour {
 		{
 			gO.SetActive (false);
 		}
+	}
+
+
+	public void LevelProgress()
+	{	
+		Variables.ballCountNow++;
+		//print (Variables.ballCountNow + " " + Variables.numberOfBalls);
+		//print (Variables.ballCountNow / Variables.numberOfBalls + "");
+		fill.fillAmount = float.Parse(Variables.ballCountNow.ToString()) / float.Parse(Variables.numberOfBalls.ToString());
 	}
 
 }

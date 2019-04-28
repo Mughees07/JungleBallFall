@@ -12,6 +12,7 @@ public class BallFallController : MonoBehaviour {
 	public GameObject levelScreenPanel;
 	public GameObject gameOverPanel;
 	public GameObject gameOverPanelLevelBased;
+	public GameObject levelStuff;
 
 	public GameObject levelPassed;
 	public GameObject levelFailed;
@@ -19,22 +20,33 @@ public class BallFallController : MonoBehaviour {
 	public GameObject CameraController;
 
 	public Text scroe;
+	public Text scroeLevel;
+
 	public Text highScore;
+	public Text highScoreLevel;
+
 	public Text ScoreGameOver;
+	public Text ScoreGameOverLevel;
+
 	public Text highScoreGameOver;
+	public Text highScoreGameOverLevel;
+
 
 	public Transform scorePopupParent;
 	public Text scorePopup;
 	public Material [] mats;
 	public GameObject ball;
-
+	public Material [] matsTrail;
 
 	public ParticleSystem flare;
 	void Awake()
 	{
 		MainMenuPanle.SetActive (false);
 		Variables.highScore = PlayerPrefs.GetInt (Constants.best);
-		highScore.text = "Best : " + Variables.highScore;
+		Variables.highScorelevel = PlayerPrefs.GetInt (Constants.bestlevel);
+		highScore.text = "Endless Best : " + Variables.highScore;
+		highScoreLevel.text = "Leveling Best : " + Variables.highScorelevel;
+
 	}
 	void Start () 
 	{
@@ -43,7 +55,7 @@ public class BallFallController : MonoBehaviour {
 		} else {
 			MainMenuPanle.SetActive (true);
 		}
-		Advertisements.Instance.Initialize ();
+//		Advertisements.Instance.Initialize ();
 	}
 
 	public Transform slide;
@@ -62,9 +74,11 @@ public class BallFallController : MonoBehaviour {
 					int i = Random.Range (0, mats.Length);
 					g.GetComponent<Renderer> ().material = mats [i];
 					g.name = mats [i].name;
+
+					TrailMat (g);
 					Destroy (g, 10f);
 
-					yield return new WaitForSeconds (2);
+					yield return new WaitForSeconds (Variables.ballAfter);
 
 				} else {
 					var balls = FindObjectsOfType<BallCollision> ();
@@ -83,13 +97,18 @@ public class BallFallController : MonoBehaviour {
 				{
 					GameObject g = Instantiate (ball, slide);
 					g.transform.localScale = new Vector3 (0.6f, 0.6f, 0.6f);
-//					int i = Random.Range (0, Variables.ballColorCount-1);
 					int i = randomNumber();
 					g.GetComponent<Renderer> ().material = mats [i];
 					g.name = mats [i].name;
-					Destroy (g, 10f);
 
-					yield return new WaitForSeconds (2);
+					TrailMat (g);
+
+
+
+
+					Destroy (g, 15f);
+
+					yield return new WaitForSeconds (Variables.ballAfter);
 
 				} else {
 					var balls = FindObjectsOfType<BallCollision> ();
@@ -101,15 +120,16 @@ public class BallFallController : MonoBehaviour {
 			}
 			if (Variables.isPlay) {
 				yield return new WaitForSeconds (4f);
+				Variables.levelNumber++;
+				PlayerPrefs.SetInt ("lvl", Variables.levelNumber);
+				PlayerPrefs.Save ();
+				print (Variables.levelNumber + "LLLLLLLLLLLL");
 				print ("Level Passed");
 				flare.Play ();
 				levelPassed.SetActive (true);
-				PlayerPrefs.SetInt ("level", Variables.levelNumber);
-				PlayerPrefs.Save ();
-				print (Variables.levelNumber + "LLLLLLLLLLLL");
 				yield return new WaitForSeconds (2f);
-				Variables.levelNumber++;
-				Variables.ballColorCount = FindObjectOfType<LevelEditor> ().level [Variables.levelNumber].numberOfColor;
+				//Variables.levelNumber++;
+				//Variables.ballColorCount = FindObjectOfType<LevelEditor> ().level [Variables.levelNumber].numberOfColor;
 				Application.LoadLevel (0);
 			}
 			yield return new WaitForSeconds (0f);
@@ -119,36 +139,52 @@ public class BallFallController : MonoBehaviour {
 	}
 
 
-	public void IncreaseScroe(int score)
+	public void TrailMat(GameObject g)
 	{
-		Variables.score += score;
+		foreach (Material m in matsTrail) 
+		{
+			if (m.name.Contains (g.name)) 
+			{
+				g.GetComponent<TrailRenderer>().material = m;
+			}
+		}
+
+	}
+
+	public void IncreaseScroe(int score , bool flag)
+	{
+
+		if (!flag) {
+			Variables.score += score;
+			this.scroe.text = Variables.score.ToString();
+		} else {
+			Variables.levelScore += score;
+			this.scroeLevel.text = Variables.levelScore.ToString();
+		}
 		Text g = Instantiate (scorePopup , scorePopupParent);
 		Destroy (g.gameObject, 0.6f);
 		g.text = "+" + score.ToString ();
-		this.scroe.text = Variables.score.ToString();
+	
 
 	}
 	public void DecreaseScroe(int score)
 	{
 		GameOver ();
-		Variables.isPlay = false;
-		return;
-
-		Variables.score -= score;
-		this.scroe.text = Variables.score.ToString();
-		Text g = Instantiate (scorePopup , scorePopupParent);
-		Destroy (g.gameObject, 0.45f);
-		g.text = "-" + score.ToString ();
-
-		//iTween.ValueTo(gameObject, iTween.Hash("from", 0f, "to", "time", 1f, "easetype", "linear", "onupdate", "setAlpha"));	
-
-		if (int.Parse (this.scroe.text.ToString ()) <= -3) 
-		{
+//		Variables.isPlay = false;
+//		return;
+//
+//		Variables.score -= score;
+//		this.scroe.text = Variables.score.ToString();
+//		Text g = Instantiate (scorePopup , scorePopupParent);
+//		Destroy (g.gameObject, 0.45f);
+//		g.text = "-" + score.ToString ();
+//		if (int.Parse (this.scroe.text.ToString ()) <= -3) 
+//		{
 //			Time.timeScale = 0;
 //			this.scroe.text = "Game  Over";
-			GameOver();
-			Variables.isPlay = false;
-		}
+//			GameOver();
+//			Variables.isPlay = false;
+//		}
 	}
 
 
@@ -158,6 +194,12 @@ public class BallFallController : MonoBehaviour {
 		{
 			scroe.gameObject.SetActive (true);
 		}
+		else 
+		{
+			levelStuff.SetActive (true);
+			this.scroeLevel.text = Variables.levelScore.ToString();
+
+		}
 		
 		Variables.isPlay = true;
 		//Variables.gameMode = Constants.endless;
@@ -166,7 +208,7 @@ public class BallFallController : MonoBehaviour {
 		CameraController.GetComponent<CPC_CameraPath> ().enabled = true;
 
 		StartCoroutine (CreateBalls ());
-		Advertisements.Instance.ShowBanner (BannerPosition.BOTTOM, BannerType.Banner);
+//		Advertisements.Instance.ShowBanner (BannerPosition.BOTTOM, BannerType.Banner);
 	}
 
 	public void levelScreen()
@@ -183,7 +225,17 @@ public class BallFallController : MonoBehaviour {
 	{
 		if (Variables.gameMode == Constants.levelBase) 
 		{
+			ScoreGameOverLevel.text = Variables.levelScore.ToString();
+			if (Variables.levelScore > Variables.highScorelevel) 
+			{
+				highScoreGameOverLevel.text = Variables.levelScore.ToString();
+				PlayerPrefs.SetInt (Constants.bestlevel, Variables.levelScore);
+			}
+			else
+				highScoreGameOverLevel.text = Variables.highScorelevel.ToString();
+			
 			gameOverPanelLevelBased.SetActive (true);
+			Variables.levelScore = 0;
 		}
 		else
 		{
@@ -197,9 +249,11 @@ public class BallFallController : MonoBehaviour {
 				highScoreGameOver.text = Variables.highScore.ToString();
 			gameOverPanel.SetActive (true);
 		}
+
+		print ("Game Over");
 		Variables.isPlay = false;
 		//vibrate phone;
-		Advertisements.Instance.ShowInterstitial ();
+//		Advertisements.Instance.ShowInterstitial ();
 	}
 		
 	public void Restart()
@@ -232,23 +286,26 @@ public class BallFallController : MonoBehaviour {
 		return i;
 	}
 
-	public void rewardedVideo()
-	{
-		Advertisements.Instance.ShowRewardedVideo (completedMethod);
-	}
+//	public void rewardedVideo()
+//	{
+//		Advertisements.Instance.ShowRewardedVideo (completedMethod);
+//	}
+//
+//	public void completedMethod(bool isCompleted)
+//	{
+//		if (isCompleted)
+//		{
+//			gameOverPanel.SetActive (false);
+//			Variables.isPlay = true;
+//		}
+//		else 
+//		{
+//			
+//		}
+//
+//	}
+//
 
-	public void completedMethod(bool isCompleted)
-	{
-		if (isCompleted)
-		{
-			gameOverPanel.SetActive (false);
-			Variables.isPlay = true;
-		}
-		else 
-		{
-			
-		}
 
-	}
 
 }

@@ -107,7 +107,7 @@ MonoBehaviour:
   initialPosition3D: {x: 0, y: 0, z: 0}
   targetPosition3D: {x: 0, y: 0, z: 0}
   initialPosition2D: {x: 0.000030517578, y: -458}
-  targetPosition2D: {x: 0.000030517578, y: -299}
+  targetPosition2D: {x: 0.000030517578, y: -300.04}
   initialRotation: {x: 0, y: 0, z: 0}
   targetRotation: {x: 0, y: 0, z: 0}
   initialScale: {x: 0, y: 0, z: 0}
